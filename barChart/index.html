@@ -14,7 +14,77 @@
 </div>
 
 
-<script src="bar.js"></script>
+
+<script>
+
+
+d3.csv("data/random.csv",function(data){
+
+//converting data using the parseFloat and  forEach function to convert each data value once
+
+    data.forEach(function(d){
+      d.x=parseFloat(d.x);
+      d.y=parseFloat(d.y);
+    });
+
+  // specifying the margins for around the visualizations
+
+var margin={top:20, bottom:20,left:50,right:20};
+//creating variable width and subtracting the margins from the set width of 700
+var width = 300 - margin.left - margin.right;
+//Similarly creating height of the visualization and subtracting it from top margins
+var height= 300- margin.top - margin.bottom;
+
+//Mapping the domain to range using the scaleLinear function
+var xVal = d3.scaleLinear().range([0,width]);
+var yVal = d3.scaleLinear().range([height,0]);
+
+//Mapping dataset range on to the scale, the starting parameter 1,1 tells where the scale/axix is going to start in the visualization
+
+xVal.domain([1,1 + d3.max(data,function(d)  {return d.x;})]);
+yVal.domain([1,1 + d3.max(data,function(d) {return d.y})]);
+
+
+//creating SVG object space in the part two div and accessing it using the div ID. Using transform/translate feature to tell which scales we want on svg
+
+var svg = d3.select("#barchart")
+        .append("svg")
+        .attr("height",height + margin.top + margin.bottom)
+        .attr("width", width + margin.left + margin.right)
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")" );
+
+
+
+  // Incorporating the scatterplot symbols in the svg place, apart from enter method, there is also exit method which I saw in an example (Link is in the text file)
+  // Also specify the width and height of the circle that we are going to draw from the cx and cy values
+
+
+svg.selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("r",10)
+      .attr("fill","blue")
+      .attr("stroke","red")
+      .attr("stroke-width",3)
+      .attr("cx", function(d){return xVal(d.x);})
+      .attr("cy",function(d){return yVal(d.y);})
+
+//Plotting x and y axis
+    svg.append("g")
+      .attr("transform","translate(0,"+height+")")
+      .call(d3.axisBottom(xVal))
+      .attr("stroke-width",2);
+
+    svg.append("g")
+      .call(d3.axisLeft(yVal))
+      .attr("stroke-width",4);
+
+
+});
+
+</script>
 </body>
 
 
